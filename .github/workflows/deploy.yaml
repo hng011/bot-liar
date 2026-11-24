@@ -11,7 +11,9 @@ jobs:
       packages: write
     uses: hng011/nyehrver/.github/workflows/deploy.yaml@main
     with:
+      namespace: my-bot-liar
       name: bot-liar
       port: 8000
+      replicas: 1
     secrets:
       INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
