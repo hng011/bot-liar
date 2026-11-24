@@ -7,7 +7,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/healthz":
-            body = {"status": "ok"}
+            body = {"status": "wassup"}
         else:
             body = {
                 "version": os.environ.get("APP_VERSION", "dev"),
