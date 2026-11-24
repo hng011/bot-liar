@@ -1,0 +1,17 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    permissions:
+      contents: read
+      packages: write
+    uses: hng011/nyehrver/.github/workflows/deploy.yaml@main
+    with:
+      name: bot-liar
+      port: 8000
+    secrets:
+      INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
