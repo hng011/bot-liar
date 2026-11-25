@@ -50,6 +50,7 @@ const json = (res: ServerResponse, code: number, body: unknown) => {
 const server = createServer(async (req, res) => {
   for (const [k, v] of Object.entries(SECURITY_HEADERS)) res.setHeader(k, v);
   try {
+    if (req.method === 'GET' && req.url === '/healthz') return json(res, 200, { ok: true });
     const ip = req.socket.remoteAddress ?? 'unknown';
     const fail = failures.get(ip);
     const locked = fail && fail.until > Date.now();
