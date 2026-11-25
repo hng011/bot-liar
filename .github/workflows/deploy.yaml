@@ -17,9 +17,9 @@ jobs:
       replicas: 1
       env_secret: bot-liar-env
       seal_env: true
-      sealing_cert: ${{ vars.SEALED_SECRETS_CERT }}
       memory_limit: 1Gi
     secrets:
+      SEALED_SECRETS_CERT: ${{ secrets.SEALED_SECRETS_CERT }}
       INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
       ADMIN_USER: ${{ secrets.ADMIN_USER }}
       ADMIN_PASS: ${{ secrets.ADMIN_PASS }}
