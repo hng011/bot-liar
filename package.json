@@ -1,0 +1,26 @@
+{
+  "name": "bot-liar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/index.ts",
+    "dev": "node --env-file=.env --watch src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "swagger-ui-dist": "^5.36.0",
+    "whatsapp-web.js": "git+https://github.com/wwebjs/whatsapp-web.js.git#38eb45b2759450cc6fccb6a7a3f2cbc3bdb87db2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/swagger-ui-dist": "^3.30.6",
+    "typescript": "^5.9.0"
+  }
+}

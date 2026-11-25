@@ -1,0 +1,24 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bot Liar</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 1.3rem; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #8884; }
+  .row .name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  code { font-size: .8rem; opacity: .7; display: block; }
+  input[type=search] { width: 100%; padding: 8px; box-sizing: border-box; margin: 12px 0; }
+  img { max-width: 260px; }
+  button { font: inherit; padding: 7px 12px; margin: 0 8px 16px 0; cursor: pointer; }
+</style>
+<h1>Bot Liar</h1>
+<p id="status">Loading…</p>
+<button id="connect" type="button" hidden>Reconnect</button>
+<button id="disconnect" type="button" hidden>Disconnect bot</button>
+<button id="unlink" type="button" hidden>Unlink WhatsApp account</button>
+<p id="action-error" role="alert"></p>
+<img id="qr" alt="" hidden>
+<input id="filter" type="search" placeholder="Filter groups" hidden>
+<div id="groups"></div>
+<script src="/ui.js"></script>
