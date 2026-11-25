@@ -9,12 +9,13 @@ export type Part =
 // Personality lives in prompts/system.md so it can be edited without touching code; restart to apply.
 const SYSTEM = readFileSync(new URL('../prompts/system.md', import.meta.url), 'utf8');
 
-export async function ask(history: Turn[], parts: Part[]): Promise<string> {
+export async function ask(history: Turn[], parts: Part[], profile = ''): Promise<string> {
   const { OPENAI_BASE_URL, OPENAI_API_KEY, OPENAI_MODEL } = process.env;
   const body = JSON.stringify({
     model: OPENAI_MODEL,
     messages: [
       { role: 'system', content: SYSTEM },
+      ...(profile ? [{ role: 'system', content: profile }] : []),
       ...history.flatMap((t) => [{ role: 'user', content: t.user }, { role: 'assistant', content: t.reply }]),
       { role: 'user', content: parts },
     ],

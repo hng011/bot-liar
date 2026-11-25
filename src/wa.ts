@@ -7,11 +7,12 @@ import { ask } from './llm.ts';
 import type { Part } from './llm.ts';
 import type { createAllowlist } from './groups.ts';
 import type { createMemory } from './memory.ts';
+import type { createPersona } from './persona.ts';
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const TEXT_TYPES = /^(text\/|application\/(json|xml|x-yaml|yaml|javascript))/;
 
-export function createBot(dataDir: string, allow: ReturnType<typeof createAllowlist>, memory: ReturnType<typeof createMemory>) {
+export function createBot(dataDir: string, allow: ReturnType<typeof createAllowlist>, memory: ReturnType<typeof createMemory>, persona: ReturnType<typeof createPersona>) {
   mkdirSync(join(dataDir, 'auth'), { recursive: true });
   // A pod restarted on the same volume leaves Chromium lock files that block launch.
   const sessionDir = join(dataDir, 'auth', 'session-primary');
@@ -92,9 +93,13 @@ export function createBot(dataDir: string, allow: ReturnType<typeof createAllowl
 
   async function handle(msg: Message) {
     try {
+      // One persona per person across every chat, keyed by the sender, not the group.
+      const userId = msg.author ?? msg.from;
+      const command = persona.command(userId, msg.body.replace(/@\d+/g, ''));
+      if (command !== null) { await msg.reply(command); return; }
       const built = await buildParts(msg);
       if (!built) return;
-      const reply = await ask(memory.get(msg.from), built.parts);
+      const reply = await ask(memory.get(msg.from), built.parts, persona.prompt(userId));
       await msg.reply(reply);
       memory.add(msg.from, { user: built.label, reply });
     } catch (err) {

@@ -8,6 +8,7 @@ import swaggerUi from 'swagger-ui-dist';
 import { createAllowlist } from './groups.ts';
 import { createMemory } from './memory.ts';
 import { openapi } from './openapi.ts';
+import { createPersona } from './persona.ts';
 import { createBot } from './wa.ts';
 
 const { ADMIN_USER, ADMIN_PASS, OPENAI_BASE_URL, OPENAI_MODEL, DATA_DIR = './data', PORT = '8000' } = process.env;
@@ -34,7 +35,7 @@ const failures = new Map<string, { count: number; until: number }>();
 const MAX_FAILS = 10;
 const LOCK_MS = 15 * 60_000;
 const allow = createAllowlist(join(DATA_DIR, 'groups.json'));
-const bot = createBot(DATA_DIR, allow, createMemory());
+const bot = createBot(DATA_DIR, allow, createMemory(join(DATA_DIR, 'memory.sqlite')), createPersona(join(DATA_DIR, 'memory.sqlite')));
 
 const SECURITY_HEADERS = {
   'x-content-type-options': 'nosniff',

@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createMemory, MAX_GROUPS, MAX_TURNS } from '../src/memory.ts';
+import { createMemory, MAX_TURNS } from '../src/memory.ts';
 
-test('keeps only the last 30 turns per group', () => {
+test('keeps only the last 20 turns per group', () => {
   const m = createMemory();
   for (let i = 0; i < 40; i++) m.add('g', { user: `u${i}`, reply: `r${i}` });
   assert.equal(m.get('g').length, MAX_TURNS);
-  assert.equal(m.get('g')[0].user, 'u10');
+  assert.equal(m.get('g')[0].user, 'u20');
   assert.equal(m.get('other').length, 0);
 });
 
@@ -17,12 +17,20 @@ test('caps a stored turn at 512 tokens (~2048 chars)', () => {
   assert.ok(t.user.length + t.reply.length <= 2048);
 });
 
-test('evicts the least recently used group when history reaches its limit', () => {
+test('clearAll wipes every chat', () => {
   const m = createMemory();
-  for (let i = 0; i < MAX_GROUPS; i++) m.add(`g${i}`, { user: 'u', reply: 'r' });
-  m.add('g0', { user: 'again', reply: 'r' });
-  m.add('new', { user: 'u', reply: 'r' });
-  assert.equal(m.get('g1').length, 0);
-  assert.equal(m.get('g0').length, 2);
-  assert.equal(m.get('new').length, 1);
+  m.add('a', { user: 'u', reply: 'r' });
+  m.add('b', { user: 'u', reply: 'r' });
+  m.clearAll();
+  assert.equal(m.get('a').length + m.get('b').length, 0);
+});
+
+test('survives reopening the database file', async () => {
+  const { mkdtempSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const file = `${mkdtempSync(`${tmpdir()}/mem-`)}/m.sqlite`;
+  const a = createMemory(file);
+  a.add('g', { user: 'hello', reply: 'hi' });
+  a.close();
+  assert.deepEqual(createMemory(file).get('g'), [{ user: 'hello', reply: 'hi' }]);
 });

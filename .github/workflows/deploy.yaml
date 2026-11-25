@@ -18,6 +18,8 @@ jobs:
       env_secret: bot-liar-env
       seal_env: true
       memory_limit: 1Gi
+      persistence_size: 1Gi
+      tcp_probe: true
     secrets:
       SEALED_SECRETS_CERT: ${{ secrets.SEALED_SECRETS_CERT }}
       INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
