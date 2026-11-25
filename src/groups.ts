@@ -1,19 +1,21 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { existsSync, readFileSync, renameSync } from 'node:fs';
+import { DatabaseSync } from 'node:sqlite';
 
-export function createAllowlist(file: string) {
-  mkdirSync(dirname(file), { recursive: true });
-  const ids = new Set<string>(existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : []);
-  const save = () => {
-    writeFileSync(`${file}.tmp`, JSON.stringify([...ids]));
-    renameSync(`${file}.tmp`, file);
-  };
+export function createAllowlist(file = ':memory:', legacyJson?: string) {
+  const db = new DatabaseSync(file, { timeout: 5000 });
+  db.exec('CREATE TABLE IF NOT EXISTS allowed_groups (id TEXT PRIMARY KEY)');
+  const insert = db.prepare('INSERT OR IGNORE INTO allowed_groups VALUES (?)');
+  // One-time import of the old groups.json so existing ticks survive the move to SQLite.
+  if (legacyJson && existsSync(legacyJson)) {
+    for (const id of JSON.parse(readFileSync(legacyJson, 'utf8')) as string[]) insert.run(id);
+    renameSync(legacyJson, `${legacyJson}.migrated`);
+  }
+  const has = db.prepare('SELECT 1 FROM allowed_groups WHERE id=?');
   return {
-    has: (id: string) => ids.has(id),
+    has: (id: string) => has.get(id) !== undefined,
     set(id: string, enabled: boolean) {
-      if (enabled) ids.add(id); else ids.delete(id);
-      save();
+      if (enabled) insert.run(id); else db.prepare('DELETE FROM allowed_groups WHERE id=?').run(id);
     },
-    clear() { ids.clear(); save(); },
+    clear() { db.exec('DELETE FROM allowed_groups'); },
   };
 }

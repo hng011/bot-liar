@@ -16,7 +16,7 @@ export function normalizeFact(key: string, value: string): [string, string] | nu
 }
 
 export function createPersona(file = ':memory:') {
-  const db = new DatabaseSync(file);
+  const db = new DatabaseSync(file, { timeout: 5000 });
   db.exec('CREATE TABLE IF NOT EXISTS persona (user_id TEXT NOT NULL, key TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY (user_id, key))');
   const list = db.prepare('SELECT key, value FROM persona WHERE user_id=? ORDER BY key');
   const facts = (userId: string) => list.all(userId).map((r) => [String(r.key), String(r.value)] as const);

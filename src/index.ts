@@ -34,7 +34,7 @@ const files: Record<string, readonly [string, Buffer]> = {
 const failures = new Map<string, { count: number; until: number }>();
 const MAX_FAILS = 10;
 const LOCK_MS = 15 * 60_000;
-const allow = createAllowlist(join(DATA_DIR, 'groups.json'));
+const allow = createAllowlist(join(DATA_DIR, 'memory.sqlite'), join(DATA_DIR, 'groups.json'));
 const bot = createBot(DATA_DIR, allow, createMemory(join(DATA_DIR, 'memory.sqlite')), createPersona(join(DATA_DIR, 'memory.sqlite')));
 
 const SECURITY_HEADERS = {

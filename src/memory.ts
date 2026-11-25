@@ -10,7 +10,7 @@ export interface Turn { user: string; reply: string }
 const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
 
 export function createMemory(file = ':memory:') {
-  const db = new DatabaseSync(file);
+  const db = new DatabaseSync(file, { timeout: 5000 });
   db.exec(`
     PRAGMA journal_mode=WAL;
     CREATE TABLE IF NOT EXISTS turns (id INTEGER PRIMARY KEY AUTOINCREMENT, chat_id TEXT NOT NULL, user TEXT NOT NULL, reply TEXT NOT NULL);
