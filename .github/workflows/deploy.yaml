@@ -5,36 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  runtime-secret:
-    runs-on: ubuntu-latest
-    permissions: {}
-    steps:
-      - name: Apply bot runtime secret
-        env:
-          KUBECONFIG_CONTENT: ${{ secrets.BOT_KUBECONFIG }}
-          ADMIN_USER: ${{ secrets.ADMIN_USER }}
-          ADMIN_PASS: ${{ secrets.ADMIN_PASS }}
-          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          umask 077
-          dir=$(mktemp -d)
-          trap 'rm -rf "$dir"' EXIT
-          export KUBECONFIG="$dir/config"
-          printf '%s' "${KUBECONFIG_CONTENT:?Missing BOT_KUBECONFIG}" > "$KUBECONFIG"
-          args=()
-          for key in ADMIN_USER ADMIN_PASS OPENAI_BASE_URL OPENAI_API_KEY OPENAI_MODEL; do
-            [[ -n "${!key}" ]] || { echo "Missing $key"; exit 1; }
-            printf '%s' "${!key}" > "$dir/$key"
-            args+=("--from-file=$key=$dir/$key")
-          done
-          kubectl -n my-bot-liar create secret generic bot-liar-env "${args[@]}" --dry-run=client -o yaml |
-            kubectl -n my-bot-liar apply --server-side --field-manager=bot-liar-deploy -f -
   deploy:
-    needs: runtime-secret
     permissions:
       contents: read
       packages: write
@@ -45,6 +16,14 @@ jobs:
       port: 8000
       replicas: 1
       env_secret: bot-liar-env
+      seal_env: true
+      sealing_cert: ${{ vars.SEALED_SECRETS_CERT }}
       memory_limit: 1Gi
     secrets:
       INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
+      ADMIN_USER: ${{ secrets.ADMIN_USER }}
+      ADMIN_PASS: ${{ secrets.ADMIN_PASS }}
+      OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+      ALLOW_DM: ${{ secrets.ALLOW_DM }}
