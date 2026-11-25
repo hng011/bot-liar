@@ -16,6 +16,6 @@ RUN npm ci --ignore-scripts --omit=dev
 RUN mkdir -p /data /app/.wwebjs_cache && chown node:node /data /app/.wwebjs_cache
 COPY src ./src
 COPY prompts ./prompts
-USER node
+USER 1000:1000
 EXPOSE 8000
 CMD ["node", "src/index.ts"]
