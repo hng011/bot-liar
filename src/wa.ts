@@ -83,9 +83,11 @@ export function createBot(dataDir: string, allow: ReturnType<typeof createAllowl
         label = `[pdf ${filename}] ${text}`;
       } else parts.push({ type: 'text', text: `[unsupported attachment: ${media?.mimetype ?? msg.type}]` });
     }
-    if (!parts.length && !text) return null;
-    parts.unshift({ type: 'text', text: `${sender}: ${text || '(no text)'}` });
-    return { parts, label: `${sender}: ${label}` };
+    const mentionOnly = !text && msg.mentionedIds.length > 0;
+    if (!parts.length && !text && !mentionOnly) return null;
+    const messageText = text || (mentionOnly ? '(tagged you)' : '(no text)');
+    parts.unshift({ type: 'text', text: `${sender}: ${messageText}` });
+    return { parts, label: `${sender}: ${label || messageText}` };
   }
 
   async function handle(msg: Message) {
