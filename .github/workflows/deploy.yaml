@@ -23,9 +23,5 @@ jobs:
     secrets:
       SEALED_SECRETS_CERT: ${{ secrets.SEALED_SECRETS_CERT }}
       INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
-      ADMIN_USER: ${{ secrets.ADMIN_USER }}
-      ADMIN_PASS: ${{ secrets.ADMIN_PASS }}
-      OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
-      ALLOW_DM: ${{ secrets.ALLOW_DM }}
+      # Whole bot-liar .env (KEY=value lines, no quotes)
+      ENV_FILE: ${{ secrets.ENV_FILE }}
